@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Playback controller",
+  "version": "1.0.0",
+
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["build/injection.js"]
+    }
+  ]
+}
