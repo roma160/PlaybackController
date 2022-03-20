@@ -75,5 +75,27 @@ export default [
 		watch: {
 			clearScreen: false
 		}
+	},
+	{
+		input: 'src/injection/injection.ts',
+		output: {
+			sourcemap: !production,
+			format: 'iife',
+			name: 'main',
+			file: 'public/build/injection.js'
+		},
+		plugins: [
+			resolve({
+				browser: true
+			}),
+			commonjs(),
+			typescript({
+				sourceMap: !production,
+				inlineSources: !production
+			})
+		],
+		watch: {
+			clearScreen: false
+		}
 	}
 ];
