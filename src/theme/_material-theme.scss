@@ -1,0 +1,27 @@
+@use "sass:map";
+
+$primary-color: #919191;
+$secondary-color: #737373;
+$error-color: #ff0072;
+$success-color: #66ff99;
+
+$material-dark-theme: map.set($material-dark-theme, "surface", transparent);
+
+// Slider override
+
+$slider-thumb-size: 12px;
+$slider-humble-scale: 2;
+
+.s-slider__handle {
+  &::before {
+    width: $slider-thumb-size * $slider-humble-scale;
+    height: $slider-thumb-size * $slider-humble-scale;
+    left: $slider-thumb-size * ($slider-humble-scale - 1) / -2;
+    top: $slider-thumb-size * ($slider-humble-scale - 1) / -2;
+  }
+}
+.s-slider__active {
+  &::before {
+    transform: scale(1.2) !important;
+  }
+}

@@ -46,7 +46,7 @@ export default class SmartSoundWorker{
         let array = new Uint8Array(this.analyser.fftSize);
         this.analyser.getByteTimeDomainData(array);
         const average = array.reduce(
-            (partialSum, a) => partialSum + Math.abs(a) - 128, 0
+            (partialSum, a) => partialSum + Math.abs(a - 128), 0
         ) / array.length;
 
         console.log(average);

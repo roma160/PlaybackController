@@ -1,15 +1,24 @@
 <script lang="ts">
-    import IconButton from "@smui/icon-button"
-    import { Icon } from "@smui/fab/dist";
-    import browser, {tabs} from "webextension-polyfill"
+    import { MaterialApp, Slider } from "svelte-materialify/src";
+    import Fab from "./Fab.svelte";
+    import {
+        mdiChevronDown, mdiChevronDoubleLeft, mdiChevronDoubleRight,
+        mdiMinus, mdiCarSpeedLimiter
+    } from "@mdi/js";
     import { slide } from 'svelte/transition'
     import { factor_key, smart_sound_is_on_key } from "../interfaces/keys";
     import { FactorChangeMessage, SmartSoundMessage, PopupMessage } from "../interfaces/messaging";
+    import browser from "webextension-polyfill"
 
     let factor = 1.0;
     const factor_delta = 0.1;
 
     let settings_opened = false, smart_sound_is_on = false;
+
+    let smartSoundButtonPath = mdiMinus;
+
+    const sliderSubdivisions = 1000;
+    let smartSoundGap, smartSoundMultiplier;
 
     // Onload
     let storage_request_is_done = false;
@@ -26,61 +35,76 @@
             browser.tabs.sendMessage(tabs[0].id, message.getJSON()));
     }
 
-    function changeFactor(delta: number): void{
+
+    // Events :
+    function onFactorChange(factorDelta: number): void{
         if(!storage_request_is_done) return;
-        factor += delta;
+        factor += factorDelta;
         sendMessageToActiveTab(new FactorChangeMessage(factor));
         browser.storage.local.set({[factor_key]: factor});
     }
 
-    function flipSmartSound(): void{
+    function onSmartSoundFlip(): void{
         if(!storage_request_is_done) return;
         smart_sound_is_on = !smart_sound_is_on;
+        smartSoundButtonPath = smart_sound_is_on ? mdiCarSpeedLimiter : mdiMinus;
         sendMessageToActiveTab(new SmartSoundMessage(smart_sound_is_on));
         browser.storage.local.set({[smart_sound_is_on_key]: smart_sound_is_on});
     }
 </script>
 
-<div class="popup">
-    <div class="buttons_row">
-        <IconButton class="material-icons button" size="button"
-                    on:click={() => settings_opened = !settings_opened}>
-            expand_more
-        </IconButton>
-        <IconButton class="material-icons button" size="button"
-                    on:click={() => changeFactor(-factor_delta)}>
-            history_toggle_off
-        </IconButton>
-        <p class="text">{factor.toFixed(1)}x</p>
-        <IconButton class="material-icons button" size="button"
-                    on:click={() => changeFactor(factor_delta)}>
-            speed
-        </IconButton>
-    </div>
-    {#if settings_opened}
-        <div class="settings" transition:slide="{{duration: 200}}">
-            <IconButton class="button" size="button" pressed={smart_sound_is_on}
-                        on:click={flipSmartSound}>
-                <Icon class="material-icons">motion_photos_off</Icon>
-                <Icon class="material-icons" on>playlist_add_circle</Icon>
-            </IconButton>
+<MaterialApp theme="dark">
+    <div class="root">
+        <div class="controls-row">
+            <Fab path={smartSoundButtonPath} on:click={onSmartSoundFlip}/>
+            <Fab path={mdiChevronDoubleLeft} on:click={() => onFactorChange(-factor_delta)}/>
+            <p class="speed_text">{factor.toFixed(1)}x</p>
+            <Fab path={mdiChevronDoubleRight} on:click={() => onFactorChange(factor_delta)}/>
+            <Fab path={mdiChevronDown} on:click={() => settings_opened = !settings_opened}/>
         </div>
-    {/if}
-</div>
 
-<style>
-    .buttons_row{
+        {#if settings_opened}
+            <div class="settings-row" transition:slide="{{duration: 200}}">
+                <Slider bind:value={smartSoundGap}/>
+                <Slider min={0} max={sliderSubdivisions} bind:value={smartSoundMultiplier}>
+                    {(smartSoundMultiplier/sliderSubdivisions).toFixed(2)}
+                </Slider>
+            </div>
+        {/if}
+    </div>
+</MaterialApp>
+
+<style lang="scss">
+    @use "src/theme/variables" as variables;
+
+    .root{
+        display: flex;
+        background-color: #383838;
+        width: 300px;
+        justify-content: center;
+        flex-direction: column;
+    }
+
+    .controls-row{
         display: flex;
         flex-direction: row;
         align-items: center;
         padding-bottom: 6px;
         padding-left: 8px;
         padding-right: 8px;
+        margin: 0 -(variables.$elements_spacing);
+        width: min-content;
+        align-self: center;
     }
 
-    .text{
-        margin: 0 10px 4px;
-        font-family: "Roboto Medium",sans-serif;
+    .settings-row{
+      margin: 0 10px;
+    }
+
+    .speed_text{
+        margin: 0 2*(variables.$elements_spacing);
+        font-family: "Roboto Medium", sans-serif;
         font-size: 11pt;
+        align-self: center;
     }
 </style>

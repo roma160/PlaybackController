@@ -6,7 +6,6 @@ import sveltePreprocess from 'svelte-preprocess';
 import typescript from '@rollup/plugin-typescript';
 import css from 'rollup-plugin-css-only';
 import livereload from "rollup-plugin-livereload";
-import copy from "rollup-plugin-copy";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -38,13 +37,20 @@ export default [
 			sourcemap: !production,
 			format: 'iife',
 			name: 'main',
-			file: 'public/build/popup.js'
+			file: 'public/build/popup.js',
+			inlineDynamicImports: true
 		},
 		plugins: [
 			svelte({
-				preprocess: sveltePreprocess({ sourceMap: !production }),
+				preprocess: sveltePreprocess({
+					sourceMap: !production,
+					scss: {
+						includePaths: ['src/theme']
+					}
+				}),
 				compilerOptions: {
-					dev: !production
+					dev: !production,
+					accessors: true
 				}
 			}),
 			css({output: 'popup.css'}),
@@ -57,15 +63,6 @@ export default [
 			typescript({
 				sourceMap: !production,
 				inlineSources: !production
-			}),
-
-			copy({
-				targets:[
-					{
-						src: "node_modules/svelte-material-ui/bare.css",
-						dest: "public/build"
-					}
-				]
 			}),
 
 			!production && serve(),
