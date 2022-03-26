@@ -41,3 +41,19 @@ export class SmartSoundMessage extends PopupMessage{
         this.newIsOnVal = newIsOnVal;
     }
 }
+export class SmartSoundGap extends PopupMessage{
+    public readonly newGapValue: number;
+
+    constructor(newGapValue: number) {
+        super();
+        this.newGapValue = newGapValue;
+    }
+}
+export class SmartSoundMultiplier extends PopupMessage{
+    public readonly newMultiplierValue: number;
+
+    constructor(newMultiplierValue: number) {
+        super();
+        this.newMultiplierValue = newMultiplierValue;
+    }
+}

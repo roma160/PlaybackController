@@ -1,3 +1,6 @@
+# Playback controller
+The project of developping extension to speedup video played inside default HTML5 player. Also features such as speedup amount dependent from video volume are planned to be added.
+
 ## The steps done:
 
 [Detailed guide](https://dev.to/khangnd/build-a-browser-extension-with-svelte-3135)

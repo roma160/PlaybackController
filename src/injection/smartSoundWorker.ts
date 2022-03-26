@@ -9,6 +9,9 @@ export default class SmartSoundWorker{
 
     private isWorking: boolean = false;
 
+    public static getGapValue = (value: number) => value * 40;
+    public static getMultiplierValue = (value: number) => Math.exp(5 * Math.pow(value, 1.5));
+
     constructor(
         smoothingTimeConstant = 0.9,
         fftSize = 512
@@ -49,7 +52,8 @@ export default class SmartSoundWorker{
             (partialSum, a) => partialSum + Math.abs(a - 128), 0
         ) / array.length;
 
-        console.log(average);
+        if(average > 0.5) this.playbackController.multiplier = 1;
+        else this.playbackController.multiplier = 10;
 
         if(this.isWorking)
             this.continueWorking();
